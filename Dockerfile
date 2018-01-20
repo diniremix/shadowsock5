@@ -1,45 +1,36 @@
-# shadowsocks
+# shadowsocks 2.8.2
 #
-# VERSION 0.1
+# VERSION 0.2
 
-FROM ubuntu:16.04
+FROM debian:jessie
+
 MAINTAINER Peter Anderson <diniremix@gmail.com>
 
-# Install.
+RUN echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
+RUN apt-get update
+# RUN apt-get -t jessie-backports install shadowsocks-libev
 
-RUN \
-  sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list && \
-  apt-get update
+RUN apt-get install -y python-pip
+# RUN apt-get install -y python-m2crypto
 
-RUN  apt-get install -y build-essential
-
-RUN  apt-get install -y software-properties-common
-
-RUN apt-get install -y curl htop zip unzip nano wget
-
-RUN rm -rf /var/lib/apt/lists/*
-
-# install pip and libsodium18
-RUN apt-get update && \
-    apt-get install -y python-pip libsodium18
-
-# install shadowsocks
-RUN pip install --upgrade pip
+RUN apt-get install -y libsodium18
 RUN pip install shadowsocks==2.8.2
 
+RUN apt-get install -y curl htop nano wget
+
+COPY shadowsocks.json /etc/
+
 # SET env vars
-ENV SS_PASSWORD 38dbfxas146
+ENV SS_PASSWORD 38xad4bfs16
 ENV SS_METHOD aes-256-cfb
 
-# Configure container to run as an executable
 # expose some ports
 EXPOSE 21
 EXPOSE 22
+EXPOSE 443
 EXPOSE 1984
 EXPOSE 8388
 
-# ENTRYPOINT ["/usr/local/bin/ssserver"]
-ENTRYPOINT ["/usr/local/bin/ssserver", "-k", ${SS_PASSWORD}, "-m", ${SS_METHOD}]
-
-# Define default command.
-# CMD ["bash"]
+# Configure container to run as an executable
+# ENTRYPOINT ["/usr/local/bin/ssserver", "-k", ${SS_PASSWORD}, "-m", ${SS_METHOD}]
+ENTRYPOINT ["/usr/local/bin/ssserver", "-c", "/etc/shadowsocks.json", "start"]
