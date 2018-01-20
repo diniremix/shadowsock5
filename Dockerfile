@@ -29,6 +29,7 @@ EXPOSE 21
 EXPOSE 22
 EXPOSE 443
 EXPOSE 1984
+EXPOSE 6570
 EXPOSE 8388
 
 # Configure container to run as an executable
